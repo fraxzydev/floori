@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Floori</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0b0f14;
+  --bg2:#111620;
+  --bg3:#181e2b;
+  --bg4:#1f2736;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --text:#f0f2f5;
+  --text2:#9ba3b2;
+  --text3:#5a6275;
+  --accent:#22c55e;
+  --accent2:#16a34a;
+  --amber:#f59e0b;
+  --red:#ef4444;
+  --r:10px;
+  --r2:14px;
+  --shadow:0 8px 32px rgba(0,0,0,0.4);
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;}
+/* ── SCREENS ── */
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;transition:opacity .25s,transform .25s;}
+.screen.hidden{opacity:0;pointer-events:none;transform:translateY(12px);}
+/* ── LOGIN SCREEN ── */
+#loginScreen{align-items:center;justify-content:center;background:var(--bg);}
+.login-glow{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(34,197,94,0.08) 0%,transparent 70%);pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%);}
+.login-card{width:100%;max-width:400px;padding:0 24px;}
+.login-logo{text-align:center;margin-bottom:40px;}
+.login-logo-mark{width:52px;height:52px;background:var(--accent);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 0 40px rgba(34,197,94,0.3);}
+.login-logo-mark svg{width:28px;height:28px;fill:none;stroke:#000;stroke-width:2.5;stroke-linecap:round;}
+.login-title{font-size:28px;font-weight:700;letter-spacing:-0.5px;color:var(--text);}
+.login-sub{font-size:13px;color:var(--text3);margin-top:4px;}
+.login-tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:4px;margin-bottom:28px;gap:4px;}
+.login-tab{flex:1;padding:9px;border:none;background:none;color:var(--text2);font-size:13px;font-weight:500;font-family:inherit;border-radius:7px;cursor:pointer;transition:all .15s;}
+.login-tab.on{background:var(--bg4);color:var(--text);font-weight:600;}
+.login-field{margin-bottom:16px;}
+.login-field label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;display:block;margin-bottom:6px;}
+.login-field input{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:12px 14px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s;}
+.login-field input:focus{border-color:var(--accent);}
+.login-btn{width:100%;background:var(--accent);color:#000;border:none;border-radius:var(--r);padding:13px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:4px;transition:background .15s;}
+.login-btn:hover{background:var(--accent2);}
+.login-err{font-size:12px;color:var(--red);text-align:center;margin-top:10px;min-height:18px;}
+/* ── ADMIN SCREEN ── */
+#adminScreen{background:var(--bg);}
+.admin-layout{display:flex;height:100%;overflow:hidden;}
+.admin-sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 12px;}
+.admin-logo{display:flex;align-items:center;gap:10px;padding:4px 8px;margin-bottom:28px;}
+.admin-logo-mark{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.admin-logo-mark svg{width:18px;height:18px;fill:none;stroke:#000;stroke-width:2.5;stroke-linecap:round;}
+.admin-logo-text{font-size:16px;font-weight:700;letter-spacing:-0.3px;}
+.admin-nav-label{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;padding:0 8px;margin-bottom:6px;}
+.admin-nav-btn{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;background:none;color:var(--text2);font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;width:100%;transition:all .15s;margin-bottom:2px;text-align:left;}
+.admin-nav-btn.on,.admin-nav-btn:hover{background:var(--bg3);color:var(--text);}
+.admin-nav-btn.on{color:var(--accent);}
+.admin-nav-btn svg{width:16px;height:16px;flex-shrink:0;opacity:0.7;}
+.admin-main{flex:1;overflow-y:auto;padding:28px 32px;}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
+.admin-page-title{font-size:22px;font-weight:700;letter-spacing:-0.4px;}
+.admin-badge{background:var(--accent);color:#000;font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;}
+/* stat cards */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;}
+.stat-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+.stat-val{font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--text);}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+.stat-card.accent .stat-val{color:var(--accent);}
+/* company table */
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
+.table-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+.table-title{font-size:14px;font-weight:600;}
+.btn-sm{background:var(--accent);color:#000;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;}
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{text-align:left;padding:10px 20px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);}
+.data-table td{padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:rgba(255,255,255,0.02);}
+.co-name{font-weight:600;color:var(--text);}
+.co-id{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;}
+.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px;}
+.status-dot.green{background:var(--accent);}
+.status-dot.amber{background:var(--amber);}
+.pill{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600;}
+.pill.green{background:rgba(34,197,94,0.12);color:var(--accent);}
+.pill.amber{background:rgba(245,158,11,0.12);color:var(--amber);}
+.pill.red{background:rgba(239,68,68,0.12);color:var(--red);}
+.row-btn{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;}
+.row-btn:hover{color:var(--text);border-color:var(--border2);}
+/* ── MANAGER SCREEN ── */
+#managerScreen{background:var(--bg);}
+.mgr-layout{display:flex;height:100%;overflow:hidden;}
+.mgr-sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 12px;}
+.mgr-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.mgr-nav{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0;}
+.mgr-nav-title{font-size:14px;font-weight:600;flex:1;}
+.mgr-content{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;}
+/* clock grid */
+.clock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:24px;}
+.clock-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;}
+.clock-card-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.clock-card-role{font-size:11px;color:var(--text3);margin-bottom:12px;}
+.clock-card-time{font-size:22px;font-weight:800;letter-spacing:-0.5px;font-family:'DM Mono',monospace;color:var(--accent);margin-bottom:2px;}
+.clock-card-status{font-size:11px;color:var(--text3);}
+.clock-card.out .clock-card-time{color:var(--text3);}
+/* section headers */
+.section-hdr{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px;}
+/* ── EMPLOYEE SCREEN ── */
+#employeeScreen{background:var(--bg);}
+.emp-layout{display:flex;flex-direction:column;height:100%;}
+.emp-nav{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;background:var(--bg2);}
+.emp-logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.emp-logo-mark svg{width:16px;height:16px;fill:none;stroke:#000;stroke-width:2.5;stroke-linecap:round;}
+.emp-name{font-size:13px;font-weight:600;flex:1;}
+.emp-co{font-size:11px;color:var(--text3);}
+.emp-body{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;}
+/* clock button */
+.clock-btn-wrap{text-align:center;padding:32px 0 24px;}
+.clock-ring{width:160px;height:160px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;position:relative;}
+.clock-ring:hover{border-color:var(--accent);box-shadow:0 0 40px rgba(34,197,94,0.15);}
+.clock-ring.clocked-in{border-color:var(--accent);background:rgba(34,197,94,0.06);box-shadow:0 0 40px rgba(34,197,94,0.15);}
+.clock-ring-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;}
+.clock-ring-time{font-size:28px;font-weight:800;letter-spacing:-1px;font-family:'DM Mono',monospace;color:var(--accent);}
+.clock-ring-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+.clock-ring.clocked-out .clock-ring-time{color:var(--text2);}
+.emp-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.emp-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;}
+.emp-card-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+.emp-card-val{font-size:20px;font-weight:800;letter-spacing:-0.5px;font-family:'DM Mono',monospace;}
+.emp-card-val.green{color:var(--accent);}
+/* shift history */
+.shift-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+.shift-row:last-child{border-bottom:none;}
+.shift-date{font-size:12px;color:var(--text2);width:80px;flex-shrink:0;}
+.shift-in{font-size:12px;font-family:'DM Mono',monospace;color:var(--text);flex:1;}
+.shift-hrs{font-size:12px;font-weight:600;font-family:'DM Mono',monospace;color:var(--accent);text-align:right;}
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:800;display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay.on{display:flex;}
+.modal-sheet{background:var(--bg2);border-radius:20px 20px 0 0;border:1px solid var(--border);padding:28px 24px;width:100%;max-width:480px;}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:6px;}
+.modal-sub{font-size:13px;color:var(--text3);margin-bottom:20px;}
+.modal-field{margin-bottom:14px;}
+.modal-field label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;}
+.modal-field input,.modal-field select{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none;}
+.modal-field input:focus,.modal-field select:focus{border-color:var(--accent);}
+.modal-actions{display:flex;gap:10px;margin-top:6px;}
+.modal-btn{flex:1;padding:11px;border-radius:8px;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;}
+.modal-btn.primary{background:var(--accent);color:#000;}
+.modal-btn.secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border2);}
+/* logout */
+.logout-btn{margin-top:auto;display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;border:none;background:none;color:var(--text3);font-size:13px;font-family:inherit;cursor:pointer;width:100%;}
+.logout-btn:hover{color:var(--red);}
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:13px;font-weight:500;padding:10px 20px;border-radius:99px;box-shadow:var(--shadow);opacity:0;transition:all .25s;z-index:999;white-space:nowrap;}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+/* animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp .3s ease both;}
+
+
+</style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#22c55e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Floori">
+  <link rel="apple-touch-icon" href="/Howell.png">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════ LOGIN ══ -->
+<div class="screen" id="loginScreen">
+  <div class="login-glow"></div>
+  <button id="installBtn" onclick="installApp()" style="display:none;position:fixed;top:16px;right:16px;background:var(--accent);color:#000;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;z-index:999;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(34,197,94,0.4)">&#11015; Download App</button>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-mark">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <div class="login-title">Floori</div>
+      <div class="login-sub">Workforce management</div>
+    </div>
+    <div class="login-tabs">
+      <button class="login-tab" onclick="setLoginTab('admin')" id="tabAdmin">Admin</button>
+      <button class="login-tab on" onclick="setLoginTab('manager')" id="tabManager">Manager</button>
+      <button class="login-tab" onclick="setLoginTab('employee')" id="tabEmployee">Employee</button>
+    </div>
+    <div class="login-field">
+      <label id="loginIdLabel">Company ID</label>
+      <input type="text" id="loginId" placeholder="e.g. bifrangi" value="bifrangi">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="••••••••" value="pass" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign in →</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ ADMIN ══ -->
+<div class="screen hidden" id="adminScreen">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="admin-logo">
+        <div class="admin-logo-mark">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div class="admin-logo-text">Floori</div>
+      </div>
+      <div class="admin-nav-label" style="margin-bottom:8px">Admin</div>
+      <button class="admin-nav-btn on" onclick="adminNav('overview',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Overview
+      </button>
+      <button class="admin-nav-btn" onclick="adminNav('companies',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21v-6h6v6"/></svg>
+        Companies
+      </button>
+      <button class="admin-nav-btn" onclick="adminNav('revenue',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Revenue
+      </button>
+      <button class="admin-nav-btn" onclick="adminNav('addCompany',this)" style="margin-top:auto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Add Company
+      </button>
+      <button class="logout-btn" onclick="logout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </button>
+    </aside>
+    <main class="admin-main" id="adminMain"></main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ MANAGER ══ -->
+<div class="screen hidden" id="managerScreen">
+  <div class="mgr-layout">
+    <aside class="mgr-sidebar">
+      <div class="admin-logo" style="margin-bottom:28px">
+        <div class="admin-logo-mark">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div>
+          <div class="admin-logo-text">Floori</div>
+          <div style="font-size:10px;color:var(--text3)" id="mgrCoName">—</div>
+        </div>
+      </div>
+      <div class="admin-nav-label" style="margin-bottom:8px">Manager</div>
+      <button class="admin-nav-btn on" onclick="mgrNav('dashboard',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+      <button class="admin-nav-btn" onclick="mgrNav('team',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Team
+      </button>
+      <button class="admin-nav-btn" onclick="mgrNav('hours',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Hours
+      </button>
+      <button class="admin-nav-btn" onclick="mgrNav('workorders',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Work Orders
+      </button>
+      <button class="admin-nav-btn" onclick="mgrNav('holiday',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Holiday
+      </button>
+      <button class="admin-nav-btn" onclick="mgrNav('addEmployee',this)" style="margin-top:auto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        Add Employee
+      </button>
+      <button class="logout-btn" onclick="logout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </button>
+    </aside>
+    <div class="mgr-main">
+      <div class="mgr-nav">
+        <div class="mgr-nav-title" id="mgrPageTitle">Dashboard</div>
+        <button id="installBtnMgr" onclick="installApp()" style="display:none;background:var(--accent);color:#000;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;align-items:center;gap:6px">&#11015; Install App</button>
+        <div id="mgrNavRight"></div>
+      </div>
+      <div class="mgr-content" id="mgrContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ EMPLOYEE ══ -->
+<div class="screen hidden" id="employeeScreen">
+  <div class="emp-layout">
+    <div class="emp-nav">
+      <div class="emp-logo-mark">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <div>
+        <div class="emp-name" id="empName">—</div>
+        <div class="emp-co" id="empCo">—</div>
+      </div>
+      <button id="installBtnEmp" onclick="installApp()" style="display:none;background:var(--accent);color:#000;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;margin-left:auto;margin-right:10px;align-items:center;gap:6px">&#11015; Install</button><button onclick="logout()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px">Sign out</button>
+    </div>
+    <div class="emp-body" id="empBody"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ MODALS ══ -->
+<div class="modal-overlay" id="addCoModal">
+  <div class="modal-sheet">
+    <div class="modal-title">Add Company</div>
+    <div class="modal-sub">Create a new company account on Floori</div>
+    <div class="modal-field"><label>Company Name</label><input type="text" id="coNameInput" placeholder="e.g. Bifrangi UK Ltd"></div>
+    <div class="modal-field"><label>Company ID (login)</label><input type="text" id="coIdInput" placeholder="e.g. bifrangi"></div>
+    <div class="modal-field"><label>Manager Password</label><input type="password" id="coPassInput" placeholder="Set a password"></div>
+    <div class="modal-field"><label>Industry</label><input type="text" id="coIndustryInput" placeholder="e.g. Manufacturing"></div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeModal('addCoModal')">Cancel</button>
+      <button class="modal-btn primary" onclick="saveCompany()">Create Company</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addEmpModal">
+  <div class="modal-sheet">
+    <div class="modal-title">Add Employee</div>
+    <div class="modal-sub">Add a new employee to your team</div>
+    <div class="modal-field"><label>Full Name</label><input type="text" id="empNameInput" placeholder="e.g. James Walsh"></div>
+    <div class="modal-field"><label>Job Title</label><input type="text" id="empTitleInput" placeholder="e.g. Maintenance Engineer"></div>
+    <div class="modal-field"><label>Employee ID (login)</label><input type="text" id="empIdInput" placeholder="e.g. jwalsh"></div>
+    <div class="modal-field"><label>Password</label><input type="password" id="empPassInput" placeholder="Set a password"></div>
+    <div class="modal-field"><label>Hourly Rate (£)</label><input type="number" id="empRateInput" placeholder="e.g. 14.50" step="0.01"></div>
+    <div class="modal-field"><label>Phone Number</label><input type="tel" id="empPhoneInput" placeholder="e.g. 07700 000000"></div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeModal('addEmpModal')">Cancel</button>
+      <button class="modal-btn primary" onclick="saveEmployee()">Add Employee</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+
+<script>
+// ── SUPABASE CONFIG ───────────────────────────────────────────────────────────
+const SB_URL = 'https://irodubxxlamkbtonclny.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb2R1Ynh4bGFta2J0b25jbG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NDY5MDksImV4cCI6MjA5ODMyMjkwOX0.KARUQSJVHmUnMIct8ng5ZpBA3xxveLMMDcy4OXSeb4g';
+
+function sbFetch(path, opts){
+  var headers = {
+    'apikey': SB_KEY,
+    'Authorization': 'Bearer ' + SB_KEY,
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Prefer': 'return=representation'
+  };
+  var options = opts ? Object.assign({}, opts) : {};
+  options.headers = Object.assign(headers, opts && opts.headers ? opts.headers : {});
+  return fetch(SB_URL + '/rest/v1/' + path, options);
+}
+function sbGet(table, query){ 
+  return sbFetch(table + '?' + query).then(function(r){ 
+    if(!r.ok) return r.json().then(function(e){ console.error('sbGet error:',table,e); return []; }); 
+    return r.json(); 
+  }).catch(function(e){ console.error('sbGet fetch error:',e); return []; }); 
+}
+function sbPost(table, body){ return sbFetch(table, {method:'POST', body:JSON.stringify(body)}).then(r=>r.json()); }
+function sbPatch(table, query, body){ return sbFetch(table+'?'+query, {method:'PATCH', body:JSON.stringify(body)}).then(r=>r.json()); }
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var currentRole = null;
+var currentCompany = null;
+var currentEmployee = null;
+var loginTab = 'manager';
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function show(id){ document.getElementById(id).classList.remove('hidden'); }
+function hide(id){ document.getElementById(id).classList.add('hidden'); }
+function toast(msg){
+  var el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('on');
+  setTimeout(function(){ el.classList.remove('on'); },2800);
+}
+function closeModal(id){ document.getElementById(id).classList.remove('on'); }
+function openModal(id){ document.getElementById(id).classList.add('on'); }
+function nowStr(){
+  var n=new Date();
+  return (n.getHours()<10?'0':'')+n.getHours()+':'+(n.getMinutes()<10?'0':'')+n.getMinutes();
+}
+function calcHrs(inStr,outStr){
+  var ip=inStr.split(':'),op=outStr.split(':');
+  return Math.round(((parseInt(op[0])*60+parseInt(op[1]))-(parseInt(ip[0])*60+parseInt(ip[1])))/60*100)/100;
+}
+function isClockedIn(emp){
+  var today=new Date().toISOString().slice(0,10);
+  return (emp.clocks||[]).find(function(c){ return c.date===today && !c.time_out; });
+}
+function totalHrsThisWeek(emp){
+  var total=0;
+  var now=new Date(); var day=now.getDay(); var diff=now.getDate()-(day===0?6:day-1);
+  var mon=new Date(now.setDate(diff)).toISOString().slice(0,10);
+  (emp.clocks||[]).forEach(function(c){ if(c.date>=mon && c.hours) total+=parseFloat(c.hours); });
+  return Math.round(total*100)/100;
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+function setLoginTab(tab){
+  loginTab=tab;
+  ['admin','manager','employee'].forEach(function(t){
+    var el=document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1));
+    if(el) el.classList.toggle('on',t===tab);
+  });
+  document.getElementById('loginIdLabel').textContent=tab==='admin'?'Admin ID':tab==='manager'?'Company ID':'Employee ID';
+  document.getElementById('loginId').placeholder=tab==='admin'?'admin':tab==='manager'?'e.g. bifrangi':'e.g. jwalsh';
+}
+
+async function doLogin(){
+  var id=document.getElementById('loginId').value.trim();
+  var pass=document.getElementById('loginPass').value;
+  var err=document.getElementById('loginErr');
+  err.textContent='Signing in…';
+
+  try {
+    if(loginTab==='admin'){
+      var admins=await sbGet('admins','username=eq.'+id+'&password=eq.'+pass);
+      if(admins.length){
+        currentRole='admin';
+        var cos=await sbGet('companies','order=created_at.desc');
+        var allEmps=await sbGet('employees','order=name.asc');
+        currentCompany={allCompanies:cos, allEmployees:allEmps};
+        hide('loginScreen'); show('adminScreen');
+        err.textContent='';
+        renderAdmin('overview');
+      } else { err.textContent='Invalid admin credentials'; }
+
+    } else if(loginTab==='manager'){
+      var cos2=await sbGet('companies','company_code=eq.'+id+'&manager_password=eq.'+pass);
+      if(cos2.length){
+        var co=cos2[0];
+        var emps=await sbGet('employees','company_id=eq.'+co.id+'&order=name.asc');
+        var clocks=await sbGet('clock_records','company_id=eq.'+co.id+'&order=date.desc');
+        var wos=await sbGet('work_orders','company_id=eq.'+co.id);
+        var hols=await sbGet('holidays','company_id=eq.'+co.id);
+        var shifts=await sbGet('shifts','company_id=eq.'+co.id+'&order=date.asc');
+        // Attach clocks and shifts to employees
+        emps.forEach(function(e){
+          e.clocks=clocks.filter(function(c){return c.employee_id===e.id;});
+          e.shifts=shifts.filter(function(s){return s.employee_id===e.id;});
+        });
+        co.employees=emps; co.workOrders=wos; co.holidays=hols;
+        currentRole='manager'; currentCompany=co;
+        hide('loginScreen'); show('managerScreen');
+        document.getElementById('mgrCoName').textContent=co.name;
+        err.textContent='';
+        mgrNav('dashboard', document.querySelector('#managerScreen .admin-nav-btn'));
+      } else { err.textContent='Invalid company ID or password'; }
+
+    } else {
+      // Employee login
+      var allCos=await sbGet('companies','select=id,name,company_code');
+      var empFound=null, coFound=null;
+      for(var ci=0;ci<allCos.length;ci++){
+        var emps2=await sbGet('employees','company_id=eq.'+allCos[ci].id+'&employee_code=eq.'+id+'&password=eq.'+pass);
+        if(emps2.length){ empFound=emps2[0]; coFound=allCos[ci]; break; }
+      }
+      if(empFound){
+        var myClocks=await sbGet('clock_records','employee_id=eq.'+empFound.id+'&order=date.desc');
+        var myShifts=await sbGet('shifts','employee_id=eq.'+empFound.id+'&order=date.asc');
+        var myHols=await sbGet('holidays','employee_id=eq.'+empFound.id);
+        var myWOs=await sbGet('work_orders','company_id=eq.'+coFound.id+'&assigned_to=eq.'+empFound.name);
+        empFound.clocks=myClocks; empFound.shifts=myShifts;
+        currentRole='employee'; currentEmployee=empFound; currentCompany=coFound;
+        currentCompany.holidays=myHols; currentCompany.workOrders=myWOs;
+        hide('loginScreen'); show('employeeScreen');
+        document.getElementById('empName').textContent=empFound.name;
+        document.getElementById('empCo').textContent=coFound.name;
+        err.textContent='';
+        renderEmployee();
+      } else { err.textContent='Invalid employee ID or password'; }
+    }
+  } catch(e){ 
+    err.textContent='Error: '+e.message; 
+    console.error('Login error:', e); 
+  }
+}
+
+function logout(){
+  currentRole=null; currentCompany=null; currentEmployee=null;
+  ['adminScreen','managerScreen','employeeScreen'].forEach(hide);
+  show('loginScreen');
+  document.getElementById('loginId').value='';
+  document.getElementById('loginPass').value='';
+}
+
+// ── ADMIN RENDER ──────────────────────────────────────────────────────────────
+function adminNav(page,btn){
+  document.querySelectorAll('.admin-nav-btn').forEach(function(b){b.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+  renderAdmin(page);
+}
+
+function renderAdmin(page){
+  var main=document.getElementById('adminMain');
+  var cos=currentCompany.allCompanies||[];
+  var allEmps=currentCompany.allEmployees||[];
+  var totalEmp=allEmps.length;
+  var mrr=totalEmp*9.97;
+
+  if(page==='overview'){
+    main.innerHTML='<div class="admin-header"><div class="admin-page-title">Overview</div><div class="admin-badge">Admin</div></div>'
+      +'<div class="stat-row">'
+      +'<div class="stat-card"><div class="stat-label">Companies</div><div class="stat-val">'+cos.length+'</div></div>'
+      +'<div class="stat-card accent"><div class="stat-label">Total Employees</div><div class="stat-val">'+totalEmp+'</div></div>'
+      +'<div class="stat-card"><div class="stat-label">MRR</div><div class="stat-val">£'+mrr.toFixed(2)+'</div><div class="stat-sub">@ £9.97/seat</div></div>'
+      +'<div class="stat-card"><div class="stat-label">ARR</div><div class="stat-val">£'+Math.round(mrr*12).toLocaleString()+'</div></div>'
+      +'</div>'
+      +'<div class="table-wrap"><div class="table-head"><div class="table-title">All Companies</div>'
+      +'<button class="btn-sm" onclick="openModal(\'addCoModal\')">+ Add Company</button></div>'
+      +'<table class="data-table"><thead><tr><th>Company</th><th>Industry</th><th>Employees</th><th>MRR</th><th>Status</th><th></th></tr></thead><tbody>'
+      +cos.map(function(c){
+        var emp=allEmps.filter(function(e){return e.company_id===c.id;}).length;
+        return '<tr><td><div class="co-name">'+c.name+'</div><div class="co-id">'+c.company_code+'</div></td>'
+          +'<td style="color:var(--text2)">'+c.industry+'</td>'
+          +'<td><span class="pill green">'+emp+' employees</span></td>'
+          +'<td style="font-family:\'DM Mono\',monospace;font-weight:600">£'+(emp*9.97).toFixed(2)+'</td>'
+          +'<td><span class="status-dot green"></span>Active</td>'
+          +'<td><button class="row-btn" onclick="adminViewCompany(\''+c.id+'\')">→</button></td></tr>';
+      }).join('')
+      +'</tbody></table></div>';
+
+  } else if(page==='revenue'){
+    main.innerHTML='<div class="admin-header"><div class="admin-page-title">Revenue</div></div>'
+      +'<div class="stat-row">'
+      +'<div class="stat-card accent"><div class="stat-label">MRR</div><div class="stat-val">£'+mrr.toFixed(2)+'</div></div>'
+      +'<div class="stat-card"><div class="stat-label">ARR</div><div class="stat-val">£'+Math.round(mrr*12).toLocaleString()+'</div></div>'
+      +'<div class="stat-card"><div class="stat-label">Per Seat</div><div class="stat-val">£9.97</div></div>'
+      +'</div>'
+      +'<div class="table-wrap"><div class="table-head"><div class="table-title">Revenue by Company</div></div>'
+      +'<table class="data-table"><thead><tr><th>Company</th><th>Employees</th><th>MRR</th><th>ARR</th></tr></thead><tbody>'
+      +cos.map(function(c){
+        var emp=allEmps.filter(function(e){return e.company_id===c.id;}).length;
+        var rev=emp*9.97;
+        return '<tr><td class="co-name">'+c.name+'</td><td>'+emp+'</td>'
+          +'<td style="font-family:\'DM Mono\',monospace;color:var(--accent)">£'+rev.toFixed(2)+'</td>'
+          +'<td style="font-family:\'DM Mono\',monospace">£'+Math.round(rev*12).toLocaleString()+'</td></tr>';
+      }).join('')+'</tbody></table></div>';
+
+  } else if(page==='addCompany'){
+    openModal('addCoModal'); renderAdmin('overview');
+  }
+}
+
+function adminViewCompany(id){
+  var cos=currentCompany.allCompanies||[];
+  var allEmps=currentCompany.allEmployees||[];
+  var co=cos.find(function(c){return c.id===id;});
+  if(!co) return;
+  var emps=allEmps.filter(function(e){return e.company_id===id;});
+  var main=document.getElementById('adminMain');
+  main.innerHTML='<div class="admin-header"><div>'
+    +'<button onclick=\"renderAdmin(\'overview\')\" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;margin-bottom:8px">← Back</button>'
+    +'<div class="admin-page-title">'+co.name+'</div></div></div>'
+    +'<div class="stat-row" style="grid-template-columns:repeat(3,1fr)">'
+    +'<div class="stat-card accent"><div class="stat-label">Employees</div><div class="stat-val">'+emps.length+'</div></div>'
+    +'<div class="stat-card"><div class="stat-label">MRR</div><div class="stat-val">£'+(emps.length*9.97).toFixed(2)+'</div></div>'
+    +'<div class="stat-card"><div class="stat-label">Login ID</div><div class="stat-val" style="font-size:16px;font-family:\'DM Mono\',monospace">'+co.company_code+'</div></div>'
+    +'</div>'
+    +'<div class="table-wrap"><div class="table-head"><div class="table-title">Employees</div></div>'
+    +'<table class="data-table"><thead><tr><th>Name</th><th>Title</th><th>Login ID</th><th>Clock No.</th><th>Phone</th><th>Rate</th></tr></thead><tbody>'
+    +emps.map(function(e){
+      return '<tr><td class="co-name">'+e.name+'</td><td style="color:var(--text2)">'+e.title+'</td>'
+        +'<td class="co-id">'+e.employee_code+'</td>'
+        +'<td style="font-family:\'DM Mono\',monospace">'+(e.clock_number||'—')+'</td>'
+        +'<td style="color:var(--text2)">'+(e.phone||'—')+'</td>'
+        +'<td style="font-family:\'DM Mono\',monospace">£'+(e.hourly_rate||0).toFixed(2)+'/hr</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+
+async function saveCompany(){
+  var name=document.getElementById('coNameInput').value.trim();
+  var code=document.getElementById('coIdInput').value.trim().toLowerCase();
+  var pass=document.getElementById('coPassInput').value;
+  var industry=document.getElementById('coIndustryInput').value.trim();
+  if(!name||!code||!pass){toast('Please fill in all fields');return;}
+  var res=await sbPost('companies',{name:name,industry:industry||'General',company_code:code,manager_password:pass});
+  if(res.error){toast('Error: '+res.error.message);return;}
+  toast(name+' added!');
+  closeModal('addCoModal');
+  // Refresh
+  currentCompany.allCompanies=await sbGet('companies','order=created_at.desc');
+  currentCompany.allEmployees=await sbGet('employees','order=name.asc');
+  renderAdmin('overview');
+}
+
+// ── MANAGER RENDER ────────────────────────────────────────────────────────────
+function mgrNav(page,btn){
+  document.querySelectorAll('#managerScreen .admin-nav-btn').forEach(function(b){b.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+  document.getElementById('mgrPageTitle').textContent={dashboard:'Dashboard',team:'Team',hours:'Clocked Hours',workorders:'Work Orders',holiday:'Holiday'}[page]||page;
+  document.getElementById('mgrNavRight').innerHTML='';
+  renderManager(page);
+}
+
+function renderManager(page){
+  var co=currentCompany;
+  var content=document.getElementById('mgrContent');
+  var emps=co.employees||[];
+
+  if(page==='dashboard'){
+    var clocked=emps.filter(isClockedIn).length;
+    var wosOpen=(co.workOrders||[]).filter(function(w){return w.status==='open';}).length;
+    var holPend=(co.holidays||[]).filter(function(h){return h.status==='pending';}).length;
+    var mgrH=new Date().getHours();
+    var mgrGreet=mgrH<12?'Good morning':mgrH<17?'Good afternoon':'Good evening';
+    var mgrTodayISO=new Date().toISOString().slice(0,10);
+    var html2='';
+    html2+='<div style="margin-bottom:14px">';
+    html2+='<div style="font-size:22px;font-weight:700;letter-spacing:-0.4px;margin-bottom:6px">'+mgrGreet+', Manager.</div>';
+    html2+='</div>';
+    html2+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 18px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">';
+    html2+='<div><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px">Next Scheduled Shift</div>';
+    html2+='<div style="font-size:14px;color:var(--text3)">No upcoming shifts scheduled</div></div>';
+    html2+='<div style="font-size:28px;opacity:0.4">📅</div></div>';
+    html2+='<div class="stat-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:12px">';
+    html2+='<div class="stat-card accent" style="padding:12px 16px"><div class="stat-label">Clocked In</div><div class="stat-val" style="font-size:22px">'+clocked+'</div><div class="stat-sub">of '+emps.length+'</div></div>';
+    html2+='<div class="stat-card" style="padding:12px 16px"><div class="stat-label">Work Orders</div><div class="stat-val" style="font-size:22px">'+wosOpen+'</div></div>';
+    html2+='<div class="stat-card" style="padding:12px 16px"><div class="stat-label">Holiday Req.</div><div class="stat-val" style="font-size:22px">'+holPend+'</div></div>';
+    html2+='</div>';
+    html2+='<div class="section-hdr" style="margin-bottom:8px">Currently On Shift</div>';
+    var onShift=emps.filter(isClockedIn);
+    if(!onShift.length){
+      html2+='<div style="font-size:13px;color:var(--text3);margin-bottom:14px;padding:8px 0">No employees currently clocked in</div>';
+    } else {
+      html2+='<div class="clock-grid" style="margin-bottom:14px">';
+      onShift.forEach(function(e){
+        var c=isClockedIn(e);
+        html2+='<div class="clock-card" style="padding:10px 12px"><div class="clock-card-name">'+e.name+'</div><div class="clock-card-role">'+e.title+'</div><div class="clock-card-time" style="font-size:16px">'+c.time_in+'</div><div class="clock-card-status">On shift since '+c.time_in+'</div></div>';
+      });
+      html2+='</div>';
+    }
+    html2+='<div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:24px">';
+    html2+='<canvas id="analogClock" width="160" height="160" style="border-radius:50%"></canvas>';
+    html2+='<div style="text-align:center"><div id="cwTime" style="font-size:28px;font-weight:800;font-family:\'DM Mono\',monospace;color:var(--accent);letter-spacing:2px"></div><div id="cwDate" style="font-size:12px;color:var(--text3);margin-top:2px"></div></div>';
+    html2+='<div style="display:flex;gap:10px;width:100%;max-width:320px">';
+    html2+='<button onclick="mgrClockIn()" style="flex:1;background:var(--accent);color:#000;border:none;border-radius:10px;padding:16px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer">▶ Clock In</button>';
+    html2+='<button onclick="mgrClockOut()" style="flex:1;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:10px;padding:16px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer">▪ Clock Out</button>';
+    html2+='</div>';
+    html2+='<div id="cwFeedback" style="font-size:12px;color:var(--text3);min-height:16px;text-align:center"></div>';
+    html2+='</div>';
+    content.innerHTML=html2;
+    setTimeout(function(){ drawAnalogClock(); updateDashClock(); },0);
+
+  } else if(page==='team'){
+    content.innerHTML='<div class="table-wrap"><div class="table-head"><div class="table-title">All Employees</div>'
+      +'<button class="btn-sm" onclick="openModal(\'addEmpModal\')">+ Add Employee</button></div>'
+      +'<table class="data-table"><thead><tr><th>Name</th><th>Title</th><th>This Week</th><th>Rate</th><th>Phone</th><th>Status</th></tr></thead><tbody>'
+      +emps.map(function(e){
+        var c=isClockedIn(e); var hrs=totalHrsThisWeek(e);
+        return '<tr><td><div class="co-name">'+e.name+'</div><div class="co-id">'+e.employee_code+'</div></td>'
+          +'<td style="color:var(--text2)">'+e.title+'</td>'
+          +'<td style="font-family:\'DM Mono\',monospace;font-weight:600">'+hrs+' hrs</td>'
+          +'<td style="font-family:\'DM Mono\',monospace">£'+(e.hourly_rate||0).toFixed(2)+'/hr</td>'
+          +'<td style="color:var(--text2)">'+(e.phone||'—')+'</td>'
+          +'<td><span class="status-dot '+(c?'green':'')+'"></span>'+(c?'In':'Out')+'</td></tr>';
+      }).join('')+'</tbody></table></div>';
+
+  } else if(page==='hours'){
+    var rows='';
+    emps.forEach(function(e){
+      (e.clocks||[]).forEach(function(c){
+        var pay=c.hours?'£'+(c.hours*e.hourly_rate).toFixed(2):'—';
+        rows+='<tr><td class="co-name">'+e.name+'</td><td style="color:var(--text2)">'+c.date+'</td>'
+          +'<td style="font-family:\'DM Mono\',monospace">'+c.time_in+'</td>'
+          +'<td style="font-family:\'DM Mono\',monospace">'+(c.time_out||'<span style="color:var(--accent)">Active</span>')+'</td>'
+          +'<td style="font-family:\'DM Mono\',monospace;font-weight:600">'+(c.hours?c.hours+' hrs':'—')+'</td>'
+          +'<td style="font-family:\'DM Mono\',monospace;color:var(--accent)">'+pay+'</td></tr>';
+      });
+    });
+    content.innerHTML='<div class="table-wrap"><div class="table-head"><div class="table-title">Clocked Hours</div></div>'
+      +'<table class="data-table"><thead><tr><th>Employee</th><th>Date</th><th>In</th><th>Out</th><th>Hours</th><th>Pay</th></tr></thead><tbody>'
+      +(rows||'<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px">No records yet</td></tr>')
+      +'</tbody></table></div>';
+
+  } else if(page==='workorders'){
+    var wos=co.workOrders||[];
+    document.getElementById('mgrNavRight').innerHTML='<button class="btn-sm" onclick="openNewWO()">+ New Work Order</button>';
+    content.innerHTML=(wos.length===0?'<div style="text-align:center;padding:48px;color:var(--text3)">No work orders yet.</div>'
+      :'<div class="table-wrap"><table class="data-table"><thead><tr><th>Title</th><th>Assigned To</th><th>Date</th><th>Status</th></tr></thead><tbody>'
+      +wos.map(function(w){
+        return '<tr><td class="co-name">'+w.title+'</td><td style="color:var(--text2)">'+(w.assigned_to||'—')+'</td>'
+          +'<td style="color:var(--text2)">'+(w.created_at||'').slice(0,10)+'</td>'
+          +'<td><span class="pill '+(w.status==='open'?'green':w.status==='done'?'amber':'red')+'">'+w.status+'</span></td></tr>';
+      }).join('')+'</tbody></table></div>');
+
+  } else if(page==='holiday'){
+    var hols=co.holidays||[];
+    content.innerHTML=(hols.length===0?'<div style="text-align:center;padding:48px;color:var(--text3)">No holiday requests yet.</div>'
+      :'<div class="table-wrap"><table class="data-table"><thead><tr><th>Employee</th><th>From</th><th>To</th><th>Days</th><th>Status</th><th></th></tr></thead><tbody>'
+      +hols.map(function(h,i){
+        return '<tr><td class="co-name">'+(h.requested_by||'—')+'</td><td>'+(h.from_date||'')+'</td><td>'+(h.to_date||'')+'</td><td>'+(h.days||'')+'</td>'
+          +'<td><span class="pill '+(h.status==='approved'?'green':h.status==='rejected'?'red':'amber')+'">'+h.status+'</span></td>'
+          +'<td style="display:flex;gap:6px">'+(h.status==='pending'
+            ?'<button class="row-btn" style="color:var(--accent)" onclick="respondHol(this.dataset.id,\'approved\')" data-id="'+h.id+'">✓</button><button class="row-btn" style="color:var(--red)" onclick="respondHol(this.dataset.id,\'rejected\')" data-id="'+h.id+'">✗</button>':'')
+          +'</td></tr>';
+      }).join('')+'</tbody></table></div>');
+  }
+}
+
+async function respondHol(id,status){
+  await sbPatch('holidays','id=eq.'+id,{status:status});
+  var co=currentCompany;
+  co.holidays=await sbGet('holidays','company_id=eq.'+co.id);
+  toast('Request '+status); renderManager('holiday');
+}
+
+async function openNewWO(){
+  var co=currentCompany;
+  var empOpts=co.employees.map(function(e){return '<option value="'+e.name+'">'+e.name+'</option>';}).join('');
+  document.getElementById('addEmpModal').querySelector('.modal-title').textContent='New Work Order';
+  document.getElementById('addEmpModal').querySelector('.modal-sub').textContent='Assign a job to an employee';
+  document.getElementById('addEmpModal').querySelector('.modal-actions').innerHTML=
+    '<button class="modal-btn secondary" onclick=\"closeModal(\'addEmpModal\')">Cancel</button>'
+    +'<button class="modal-btn primary" onclick="saveWO()">Create</button>';
+  var fields=document.getElementById('addEmpModal').querySelectorAll('.modal-field');
+  fields[0].innerHTML='<label>Job Title</label><input type="text" id="woTitle" placeholder="e.g. Check hydraulic seals">';
+  fields[1].innerHTML='<label>Assign To</label><select id="woAssign">'+empOpts+'</select>';
+  fields[2].style.display='none'; fields[3].style.display='none'; fields[4].style.display='none';
+  openModal('addEmpModal');
+}
+
+async function saveWO(){
+  var title=document.getElementById('woTitle')&&document.getElementById('woTitle').value;
+  var assign=document.getElementById('woAssign')&&document.getElementById('woAssign').value;
+  if(!title){toast('Enter a job title');return;}
+  await sbPost('work_orders',{company_id:currentCompany.id,title:title,assigned_to:assign,status:'open'});
+  currentCompany.workOrders=await sbGet('work_orders','company_id=eq.'+currentCompany.id);
+  closeModal('addEmpModal'); toast('Work order created'); mgrNav('workorders',null);
+}
+
+async function saveEmployee(){
+  var name=document.getElementById('empNameInput').value.trim();
+  var title=document.getElementById('empTitleInput').value.trim();
+  var code=document.getElementById('empIdInput').value.trim().toLowerCase();
+  var pass=document.getElementById('empPassInput').value;
+  var rate=parseFloat(document.getElementById('empRateInput').value)||0;
+  var phone=document.getElementById('empPhoneInput')?document.getElementById('empPhoneInput').value.trim():'';
+  if(!name||!code||!pass){toast('Please fill in all required fields');return;}
+  var res=await sbPost('employees',{company_id:currentCompany.id,name:name,title:title||'Employee',employee_code:code,password:pass,hourly_rate:rate,phone:phone,clocks:[]});
+  if(res.error){toast('Error: '+(res.error.message||'Could not add employee'));return;}
+  // Refresh employees
+  var emps=await sbGet('employees','company_id=eq.'+currentCompany.id+'&order=name.asc');
+  var clocks=await sbGet('clock_records','company_id=eq.'+currentCompany.id);
+  emps.forEach(function(e){ e.clocks=clocks.filter(function(c){return c.employee_id===e.id;}); e.shifts=[]; });
+  currentCompany.employees=emps;
+  closeModal('addEmpModal'); toast(name+' added!'); mgrNav('team',null);
+}
+
+// ── MANAGER CLOCK ─────────────────────────────────────────────────────────────
+async function mgrClockIn(){
+  var co=currentCompany;
+  co.managerClocks=co.managerClocks||[];
+  var today=new Date().toISOString().slice(0,10);
+  var existing=co.managerClocks.find(function(c){return c.date===today&&!c.time_out;});
+  var fb=document.getElementById('cwFeedback');
+  if(existing){if(fb){fb.style.color='var(--amber)';fb.textContent='Already clocked in since '+existing.time_in;}return;}
+  var t=nowStr();
+  co.managerClocks.push({date:today,time_in:t,time_out:null,hours:null});
+  if(fb){fb.style.color='var(--accent)';fb.textContent='Clocked in at '+t;}
+  toast('Clocked in at '+t);
+  setTimeout(function(){if(fb)fb.textContent='';},3000);
+}
+async function mgrClockOut(){
+  var co=currentCompany;
+  co.managerClocks=co.managerClocks||[];
+  var today=new Date().toISOString().slice(0,10);
+  var existing=co.managerClocks.find(function(c){return c.date===today&&!c.time_out;});
+  var fb=document.getElementById('cwFeedback');
+  if(!existing){if(fb){fb.style.color='var(--amber)';fb.textContent='Not clocked in.';}return;}
+  var t=nowStr();
+  existing.time_out=t; existing.hours=calcHrs(existing.time_in,t);
+  if(fb){fb.style.color='var(--accent)';fb.textContent='Clocked out at '+t+' ('+existing.hours+' hrs)';}
+  toast('Clocked out at '+t);
+  setTimeout(function(){if(fb)fb.textContent='';},3000);
+}
+
+// ── EMPLOYEE RENDER ───────────────────────────────────────────────────────────
+function renderEmployee(){
+  var emp=currentEmployee;
+  var co=currentCompany;
+  var clocked=isClockedIn(emp);
+  var hrsWeek=totalHrsThisWeek(emp);
+  var payWeek=(hrsWeek*(emp.hourly_rate||0)).toFixed(2);
+  var myWOs=co.workOrders||[];
+  var myHols=co.holidays||[];
+  var h2=new Date().getHours();
+  var greet=h2<12?'Good morning':h2<17?'Good afternoon':'Good evening';
+  var shifts=emp.shifts||[];
+  var todayISO=new Date().toISOString().slice(0,10);
+  var nextShift=null;
+  for(var s=0;s<shifts.length;s++){if(shifts[s].date>=todayISO){nextShift=shifts[s];break;}}
+
+  var html='';
+  html+='<div style="margin-bottom:14px">';
+  html+='<div style="font-size:22px;font-weight:700;letter-spacing:-0.4px;margin-bottom:6px">'+greet+', '+emp.name.split(' ')[0]+'.</div>';
+  if(clocked){
+    html+='<div style="display:inline-flex;align-items:center;gap:7px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:99px;padding:5px 14px"><div style="width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(34,197,94,0.6)"></div><span style="font-size:13px;font-weight:600;color:var(--accent)">On shift since '+clocked.time_in+'</span></div>';
+  } else {
+    html+='<div style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:99px;padding:5px 14px"><div style="width:8px;height:8px;border-radius:50%;background:var(--text3)"></div><span style="font-size:13px;color:var(--text3)">Not clocked in</span></div>';
+  }
+  html+='</div>';
+  html+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">';
+  html+='<div><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px">'+(clocked&&nextShift&&nextShift.date===todayISO?'Current Shift':'Next Scheduled Shift')+'</div>';
+  if(nextShift){
+    var d2=new Date(nextShift.date);
+    var days3=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    var months3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var isToday2=nextShift.date===todayISO;
+    var dateLabel=isToday2?'Today':days3[d2.getDay()]+' '+d2.getDate()+' '+months3[d2.getMonth()];
+    html+='<div style="font-size:16px;font-weight:700;color:var(--text)">'+dateLabel+' — '+(nextShift.start_time||nextShift.start)+' to '+(nextShift.end_time||nextShift.end)+'</div>';
+    html+='<div style="font-size:12px;color:var(--text3);margin-top:2px">'+(nextShift.role||'')+'</div>';
+  } else {
+    html+='<div style="font-size:14px;color:var(--text3)">No upcoming shifts scheduled</div>';
+  }
+  html+='</div><div style="font-size:28px;opacity:0.4">📅</div></div>';
+  html+='<div class="emp-cards" style="margin-bottom:14px">';
+  html+='<div class="emp-card"><div class="emp-card-label">This Week</div><div class="emp-card-val green">'+hrsWeek+' hrs</div></div>';
+  html+='<div class="emp-card"><div class="emp-card-label">Est. Pay</div><div class="emp-card-val">£'+payWeek+'</div></div>';
+  html+='</div>';
+  html+='<div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:auto;padding-top:8px">';
+  html+='<canvas id="analogClock" width="160" height="160" style="border-radius:50%"></canvas>';
+  html+='<div style="text-align:center"><div id="cwTime" style="font-size:28px;font-weight:800;font-family:\'DM Mono\',monospace;color:var(--accent);letter-spacing:2px"></div><div id="cwDate" style="font-size:12px;color:var(--text3);margin-top:2px"></div></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:320px">';
+  html+='<button onclick="empClockIn()" style="background:var(--accent);color:#000;border:none;border-radius:10px;padding:16px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer">▶ Clock In</button>';
+  html+='<button onclick="empClockOut()" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:10px;padding:16px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer">▪ Clock Out</button>';
+  html+='</div>';
+  html+='<div id="empClockFeedback" style="font-size:12px;color:var(--text3);min-height:16px;text-align:center"></div>';
+  html+='</div>';
+  if(myWOs.length){
+    html+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;margin-top:16px">';
+    html+='<div class="section-hdr" style="margin-bottom:10px">My Work Orders</div>';
+    myWOs.forEach(function(w){
+      html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><div style="font-size:13px;font-weight:500">'+w.title+'</div><span class="pill '+(w.status==='open'?'green':'amber')+'">'+w.status+'</span></div>';
+    });
+    html+='</div>';
+  }
+  document.getElementById('empBody').innerHTML=html;
+  setTimeout(function(){ drawAnalogClock(); updateDashClock(); },0);
+}
+
+async function empClockIn(){
+  var emp=currentEmployee;
+  var existing=isClockedIn(emp);
+  var fb=document.getElementById('empClockFeedback');
+  if(existing){if(fb){fb.style.color='var(--amber)';fb.textContent='Already clocked in since '+existing.time_in;}return;}
+  var today=new Date().toISOString().slice(0,10);
+  var t=nowStr();
+  var res=await sbPost('clock_records',{company_id:currentCompany.id,employee_id:emp.id,date:today,time_in:t,time_out:null,hours:null});
+  if(res.error){toast('Error saving clock record');return;}
+  emp.clocks=emp.clocks||[];
+  emp.clocks.unshift(res[0]||{date:today,time_in:t,time_out:null,hours:null});
+  toast('Clocked in at '+t);
+  renderEmployee();
+}
+
+async function empClockOut(){
+  var emp=currentEmployee;
+  var existing=isClockedIn(emp);
+  var fb=document.getElementById('empClockFeedback');
+  if(!existing){if(fb){fb.style.color='var(--amber)';fb.textContent='You are not clocked in.';}return;}
+  var t=nowStr();
+  var hrs=calcHrs(existing.time_in,t);
+  if(existing.id){
+    await sbPatch('clock_records','id=eq.'+existing.id,{time_out:t,hours:hrs});
+  }
+  existing.time_out=t; existing.hours=hrs;
+  toast('Clocked out at '+t+' ('+hrs+' hrs)');
+  renderEmployee();
+}
+
+async function requestHoliday(){
+  var from=prompt('From date (YYYY-MM-DD):');
+  var to=prompt('To date (YYYY-MM-DD):');
+  if(!from||!to) return;
+  var days=Math.max(1,Math.round((new Date(to)-new Date(from))/(86400000))+1);
+  await sbPost('holidays',{company_id:currentCompany.id,employee_id:currentEmployee.id,requested_by:currentEmployee.name,from_date:from,to_date:to,days:days,status:'pending'});
+  currentCompany.holidays=await sbGet('holidays','employee_id=eq.'+currentEmployee.id);
+  toast('Holiday request submitted'); renderEmployee();
+}
+
+// ── CLOCK DISPLAY ─────────────────────────────────────────────────────────────
+function drawAnalogClock(){
+  var canvas=document.getElementById('analogClock');
+  if(!canvas||!canvas.getContext) return;
+  var ctx=canvas.getContext('2d');
+  var size=canvas.width, cx=size/2, cy=size/2, r=size/2-4;
+  var now=new Date();
+  var h=now.getHours()%12, m=now.getMinutes(), s=now.getSeconds();
+  ctx.clearRect(0,0,size,size);
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle='#181e2b'; ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1.5; ctx.stroke();
+  for(var i=0;i<60;i++){
+    var ang=i*Math.PI/30-Math.PI/2; var isMaj=i%5===0; var len=isMaj?10:4;
+    ctx.beginPath(); ctx.moveTo(cx+Math.cos(ang)*(r-len-2),cy+Math.sin(ang)*(r-len-2));
+    ctx.lineTo(cx+Math.cos(ang)*(r-2),cy+Math.sin(ang)*(r-2));
+    ctx.strokeStyle=isMaj?'#f0f2f5':'rgba(255,255,255,0.2)'; ctx.lineWidth=isMaj?2:1; ctx.stroke();
+  }
+  var hAng=(h+m/60)*Math.PI/6-Math.PI/2;
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(hAng)*(r*0.5),cy+Math.sin(hAng)*(r*0.5));
+  ctx.strokeStyle='#f0f2f5'; ctx.lineWidth=4; ctx.lineCap='round'; ctx.stroke();
+  var mAng=(m+s/60)*Math.PI/30-Math.PI/2;
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(mAng)*(r*0.7),cy+Math.sin(mAng)*(r*0.7));
+  ctx.strokeStyle='#f0f2f5'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.stroke();
+  var sAng=s*Math.PI/30-Math.PI/2;
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(sAng)*(r*0.75),cy+Math.sin(sAng)*(r*0.75));
+  ctx.strokeStyle='#22c55e'; ctx.lineWidth=1.5; ctx.lineCap='round'; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,4,0,Math.PI*2); ctx.fillStyle='#22c55e'; ctx.fill();
+}
+
+function updateDashClock(){
+  var n=new Date();
+  var h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
+  var el=document.getElementById('cwTime');
+  if(el) el.textContent=(h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var del=document.getElementById('cwDate');
+  if(del) del.textContent=days[n.getDay()]+' '+n.getDate()+' '+months[n.getMonth()]+' '+n.getFullYear();
+}
+
+setInterval(function(){ drawAnalogClock(); updateDashClock(); },1000);
+setLoginTab('manager');
+</script>
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('/sw.js').then(function(reg){
+      console.log('Floori SW registered');
+    }).catch(function(err){
+      console.log('SW error:', err);
+    });
+  });
+}
+
+// ── PWA INSTALL ───────────────────────────────────────────────────────────────
+var _deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  _deferredPrompt = e;
+  ['installBtn','installBtnMgr','installBtnEmp'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.style.display = 'flex';
+  });
+});
+
+window.addEventListener('appinstalled', function(){
+  _deferredPrompt = null;
+  ['installBtn','installBtnMgr','installBtnEmp'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.style.display = 'none';
+  });
+  var t = document.getElementById('toast');
+  if(t){ t.textContent = 'Floori installed!'; t.classList.add('on'); setTimeout(function(){t.classList.remove('on');},3000); }
+});
+
+function installApp(){
+  if(!_deferredPrompt) return;
+  _deferredPrompt.prompt();
+  _deferredPrompt.userChoice.then(function(result){
+    _deferredPrompt = null;
+    ['installBtn','installBtnMgr','installBtnEmp'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.style.display = 'none';
+    });
+  });
+}
+
+</script>
+</body>
+</html>
